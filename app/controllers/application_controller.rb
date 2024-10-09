@@ -19,7 +19,7 @@ end
 
 
 class JsonWebToken
-    SECRET_KEY = "1af071dbad3e21b7367786b242402eec"
+    SECRET_KEY = Rails.application.credentials.secret_key_base
   
     def self.encode(payload, exp = 24.hours.from_now)
       payload[:exp] = exp.to_i
