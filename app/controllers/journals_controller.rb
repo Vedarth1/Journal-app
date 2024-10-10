@@ -1,18 +1,30 @@
 class JournalsController < ApplicationController
   before_action :authorize_request
-  before_action :set_journal, only: [:destroy, :update]
+  before_action :set_journal, only: [:destroy, :update ,:show]
   
   def create
     @journal = Journal.new(journal_params)
     @journal.user_id = current_user.id
-
+  
     if @journal.save
+      uploaded_urls = []
+  
       if params[:attachments]
         params[:attachments].each do |attachment|
-          @journal.attachments.attach(attachment)
+          uploaded_file = Cloudinary::Uploader.upload(attachment)
+          uploaded_urls << uploaded_file['secure_url']
+          Attachment.create!(
+            journal_id: @journal.id,
+            url: uploaded_file['secure_url'],
+          )
         end
       end
-      render json: { message: "Journal created successfully", journal: @journal }, status: :created
+  
+      render json: { 
+        message: "Journal created successfully.", 
+        journal: @journal, 
+        attachments: uploaded_urls 
+      }, status: :created
     else
       render json: { errors: @journal.errors.full_messages }, status: :unprocessable_entity
     end
@@ -29,21 +41,31 @@ class JournalsController < ApplicationController
   end
 
   def update
+    uploaded_urls = []
+  
     if @journal.update(journal_params)
-
-      @journal.attachments.purge if params[:attachments].present?
-      
-      if params[:attachments]
+      if params[:attachments].present?
+        Attachment.where(journal_id: @journal.id).delete_all
+        
         params[:attachments].each do |attachment|
-          @journal.attachments.attach(attachment)
+          uploaded_file = Cloudinary::Uploader.upload(attachment)
+          uploaded_urls << uploaded_file['secure_url']
+          Attachment.create!(
+            journal_id: @journal.id,
+            url: uploaded_file['secure_url']
+          )
         end
       end
       
-      render json: { message: "Journal updated successfully.", journal: @journal }, status: :ok
+      render json: { 
+        message: "Journal updated successfully.", 
+        journal: @journal, 
+        attachments: uploaded_urls 
+      }, status: :ok
     else
       render json: { errors: @journal.errors.full_messages }, status: :unprocessable_entity
     end
-  end
+  end  
 
   def destroy
     if @journal.nil?
@@ -52,6 +74,10 @@ class JournalsController < ApplicationController
       @journal.destroy
       render json: { message: "Journal deleted successfully" }, status: :no_content
     end
+  end
+
+  def show
+    render json: @journal, status: :ok
   end
 
   private

@@ -32,6 +32,10 @@ gem 'jwt'
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin Ajax possible
 gem "rack-cors"
 
+#for attachments upload on cloudinary
+gem 'cloudinary'
+gem 'activestorage-cloudinary-service'
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_10_10_074931) do
+ActiveRecord::Schema[7.2].define(version: 2024_10_10_132821) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -37,6 +37,14 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_10_074931) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "attachments", force: :cascade do |t|
+    t.integer "journal_id", null: false
+    t.string "url"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["journal_id"], name: "index_attachments_on_journal_id"
   end
 
   create_table "journal_permissions", force: :cascade do |t|
@@ -71,6 +79,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_10_074931) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "attachments", "journals"
   add_foreign_key "journal_permissions", "journals"
   add_foreign_key "journal_permissions", "users"
   add_foreign_key "journals", "users"
