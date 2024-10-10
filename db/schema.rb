@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_10_10_032909) do
+ActiveRecord::Schema[7.2].define(version: 2024_10_10_074931) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -57,6 +57,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_10_032909) do
     t.string "public_url"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "view_later", default: false
     t.index ["user_id"], name: "index_journals_on_user_id"
   end
 
