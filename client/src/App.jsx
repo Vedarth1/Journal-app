@@ -1,6 +1,7 @@
 import React from 'react';
 import brandLogo from './assets/brand.svg';
 import index from './assets/index.jpg';
+import { Link } from 'react-router-dom';
 
 function App() {
   return (
@@ -11,8 +12,8 @@ function App() {
           <span className="text-white text-2xl font-bold">Journal App</span>
         </div>
         <div className="flex space-x-4">
-          <button className="text-white">Signup</button>
-          <button className="text-white">Signin</button>
+          <Link to='/signup' className="text-white">Signup</Link>
+          <Link to='/login' className="text-white">Login</Link>
         </div>
       </nav>
 
@@ -28,9 +29,9 @@ function App() {
             Satisfy your inner self.<br />
             Enjoy accomplishing your tasks everyday!
           </p>
-          <button className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded">
+          <Link to='/login' className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded">
             Start Now!
-          </button>
+          </Link>
         </div>
       </main>
     </div>
