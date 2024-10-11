@@ -1,6 +1,6 @@
 class JournalsController < ApplicationController
   before_action :authorize_request , except: :public_view
-  before_action :set_journal, only: [:destroy, :update ,:show, :share]
+  before_action :set_journal, only: [:destroy, :update ,:show, :share, :revokeshare , :update_visibility ,:public_url]
   
   def create
     @journal = Journal.new(journal_params)
@@ -83,7 +83,7 @@ class JournalsController < ApplicationController
   def public_view
     @journal = Journal.find_by!(public_url: params[:public_url])
     attachments = Attachment.where(journal_id: @journal.id)
-  render json: { journal: @journal, attachments: attachments } #read only
+    render json: { journal: @journal, attachments: attachments }
   end
 
   def share
@@ -105,6 +105,40 @@ class JournalsController < ApplicationController
       end
     else
       render json: { error: 'User not found' }, status: :not_found
+    end
+  end
+
+  def revokeshare
+    user_to_revoke = User.find_by(username: params[:username])
+  
+    if user_to_revoke
+      shared_journal = JournalPermission.find_by(journal_id: @journal.id, user_id: user_to_revoke.id)
+  
+      if shared_journal
+        shared_journal.destroy
+        render json: { message: 'Sharing permission revoked successfully' }, status: :ok
+      else
+        render json: { error: 'No sharing permission found for this user' }, status: :not_found
+      end
+    else
+      render json: { error: 'User not found' }, status: :not_found
+    end
+  end
+
+  def update_visibility
+    if @journal.update(visibility: params[:visibility])
+      render json: { message: "Journal visibility updated to #{params[:visibility]}" }, status: :ok
+    else
+      render json: { errors: @journal.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
+  def public_url
+    if @journal.visibility == 'public'
+      public_url = "http://127.0.0.1:3000/journals/public/#{@journal.public_url}"
+      render json: { public_url: public_url }, status: :ok
+    else
+      render json: { message: 'This journal is not public.' }, status: :forbidden
     end
   end
 
