@@ -10,4 +10,10 @@ Rails.application.routes.draw do
   post '/add/attachment', to: 'attachments#create' #done
   delete '/delete/attachments/:id', to:'attachments#destroy' #done
   get '/get/attachments/:journal_id', to: 'attachments#index' #done
+
+  get '/journals/public/:public_url', to: 'journals#public_view' #done
+  post '/journals/:id/share/:username/:permission', to: 'journals#share'  #done
+  get '/sharedjournals/get', to: 'journal_permission#index' #done
+  delete '/journals/:id/shareddelete/:username', to: 'journal_permission#destroy' #done
+  put '/journals/:id/sharedupdate/:username/:permission', to: 'journal_permission#update_permission' #done
 end

@@ -1,6 +1,6 @@
 class JournalsController < ApplicationController
-  before_action :authorize_request
-  before_action :set_journal, only: [:destroy, :update ,:show]
+  before_action :authorize_request , except: :public_view
+  before_action :set_journal, only: [:destroy, :update ,:show, :share]
   
   def create
     @journal = Journal.new(journal_params)
@@ -78,6 +78,34 @@ class JournalsController < ApplicationController
 
   def show
     render json: @journal, status: :ok
+  end
+
+  def public_view
+    @journal = Journal.find_by!(public_url: params[:public_url])
+    attachments = Attachment.where(journal_id: @journal.id)
+  render json: { journal: @journal, attachments: attachments } #read only
+  end
+
+  def share
+    user_to_share_with = User.find_by(username: params[:username])
+    permission = params[:permission] || 'read'
+    if user_to_share_with
+      existing_permission = JournalPermission.find_by(journal_id: @journal.id, user_id: user_to_share_with.id)
+
+      if existing_permission
+        render json: { message: 'journal already shared' }, status: :ok
+      else
+        @shared_journal = JournalPermission.create(
+          journal: @journal,
+          user: user_to_share_with,
+          permission: permission,
+          shared_by: current_user.username
+        )
+        render json: { message: 'Journal shared successfully' }, status: :ok
+      end
+    else
+      render json: { error: 'User not found' }, status: :not_found
+    end
   end
 
   private
