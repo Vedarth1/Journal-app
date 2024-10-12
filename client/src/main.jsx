@@ -7,6 +7,8 @@ import Login from './pages/login.jsx';
 import SignUp from "./pages/signup.jsx";
 import './index.css'
 import DashBoard from "./pages/dashboard.jsx";
+import ViewJournal from "./pages/ViewJournal.jsx";
+import CreateJournal from "./pages/createJournal.jsx";
 
 const router = createBrowserRouter([
   {
@@ -25,6 +27,14 @@ const router = createBrowserRouter([
   {
     path: "/user/dashboard",
     element: <DashBoard/>
+  },
+  {
+    path:"/user/viewjournal",
+    element: <ViewJournal/>
+  },
+  {
+    path:"/user/createjournal",
+    element: <CreateJournal/>
   }
 ]);
 
