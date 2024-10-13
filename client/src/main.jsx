@@ -9,6 +9,7 @@ import './index.css'
 import DashBoard from "./pages/dashboard.jsx";
 import ViewJournal from "./pages/ViewJournal.jsx";
 import CreateJournal from "./pages/createJournal.jsx";
+import EditJournal from "./pages/EditJournal.jsx";
 
 const router = createBrowserRouter([
   {
@@ -35,6 +36,10 @@ const router = createBrowserRouter([
   {
     path:"/user/createjournal",
     element: <CreateJournal/>
+  },
+  {
+    path:"/user/edit-journal/:id",
+    element: <EditJournal/>
   }
 ]);
 

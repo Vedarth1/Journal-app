@@ -1,4 +1,3 @@
-// completed
 import React, { useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -22,9 +21,11 @@ const CreateJournal = () => {
       title: '',
       attachments: [],
       viewLater: false,
+      visibility: 'private', // Add visibility field with default value 'private'
     },
     validationSchema: Yup.object({
       title: Yup.string().required('Title is required'),
+      visibility: Yup.string().oneOf(['private', 'public'], 'Invalid visibility option'),
     }),
     onSubmit: async (values) => {
       setSubmitError('');
@@ -36,6 +37,7 @@ const CreateJournal = () => {
         formData.append('journal[title]', values.title);
         formData.append('journal[content]', content);
         formData.append('journal[view_later]', values.viewLater ? 'true' : 'false');
+        formData.append('journal[visibility]', values.visibility); // Add visibility to form data
     
         Array.from(values.attachments).forEach((file) => {
           formData.append('attachments[]', file);
@@ -54,11 +56,8 @@ const CreateJournal = () => {
         if (!response.ok) {
           throw new Error('Failed to create journal');
         }
-    
-        setSubmitSuccess('Journal created successfully!');
-        setTimeout(() => {
-          navigate('/user/dashboard');
-        }, 1500);
+          
+        navigate('/user/dashboard');
       } catch (error) {
         setSubmitError('Failed to create journal. Please try again.');
         toast.error("Server Side Error!", {
@@ -110,6 +109,27 @@ const CreateJournal = () => {
             <ReactQuill value={content} onChange={setContent} className="border border-gray-300 rounded-md" />
           </div>
 
+          {/* Visibility */}
+          <div className="mb-4">
+            <label htmlFor="visibility" className="block mb-2 text-gray-700">
+              Visibility
+            </label>
+            <select
+              id="visibility"
+              name="visibility"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.visibility}
+            >
+              <option value="private">Private</option>
+              <option value="public">Public</option>
+            </select>
+            {formik.touched.visibility && formik.errors.visibility && (
+              <div className="text-red-500 text-sm">{formik.errors.visibility}</div>
+            )}
+          </div>
+
           {/* Checkbox */}
           <div className="mb-4 flex items-center">
             <Checkbox
@@ -149,14 +169,6 @@ const CreateJournal = () => {
                   <MdSave className="mr-2" /> Save Journal
                 </>
               )}
-            </button>
-
-            <button
-              type="button"
-              className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md flex items-center justify-center hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300"
-              onClick={() => formik.resetForm()}
-            >
-              <MdOutlineAddCircleOutline className="mr-2" /> New Entry
             </button>
           </div>
         </form>

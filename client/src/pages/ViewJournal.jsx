@@ -1,4 +1,3 @@
-// completed
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ReceivedJournals from '../components/ReceivedJournals';
@@ -74,27 +73,40 @@ const ViewJournal = () => {
     setShowPublicUrl(false);
   };
 
-  const handleDeleteJournal = () => {
+  const handleDeleteJournal = async () => {
     const confirmDelete = window.confirm('Are you sure you want to delete this journal?');
     if (confirmDelete) {
-      // API call to delete the journal
-      console.log('Journal deleted');
+      try {
+        const token = localStorage.getItem('token');
+  
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/delete/${id}`, {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+  
+        if (!response.ok) {
+          throw new Error("Failed to delete journal");
+        }
+        navigate('/user/dashboard');
+      } catch (error) {
+        console.error("Error deleting journal:", error);
+      }
     }
-  };
+  };  
 
   const handleEditJournal = () => {
-    navigate('/edit-journal', { state: { journal } });
+    navigate(`/user/edit-journal/${id}`, { state: { journal } });
   };
 
   if (!journal) {
-    return <p>Loading journal...</p>; // Show loading state while fetching
+    return <p>Loading journal...</p>;
   }
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100 relative">
       <div className="bg-white shadow-md rounded-lg p-8 max-w-xl w-full relative">
-        
-        {/* Delete and Edit icons */}
         <div className="absolute top-4 right-4 flex space-x-4">
           <FaEdit
             className="text-blue-500 hover:text-blue-700 cursor-pointer"
@@ -107,26 +119,54 @@ const ViewJournal = () => {
             onClick={handleDeleteJournal}
           />
         </div>
-        
-        <h1 className="text-2xl font-bold text-blue-700 mb-2 text-center">{journal.title}</h1>
-        <p className="text-center text-gray-600 mb-6">{journal.content}</p>
 
-        <p className="text-gray-700 mb-8">Created at: {new Date(journal.created_at).toLocaleString()}</p>
+        {/* Title */}
+        <h1 className="text-2xl font-bold text-blue-700 mb-4 text-center">{journal.title}</h1>
 
-        {!isPublic && (
-          <p className="text-red-600 mb-4 text-center">This journal is private.</p>
-        )}
-        
-        <div className="flex justify-center mb-4">
+        {/* Attachments */}
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold text-gray-800 mb-3">Attachments:</h3>
+          {attachments.length > 0 ? (
+            <div className="grid grid-cols-2 gap-4">
+              {attachments.map(attachment => (
+                <div key={attachment.id} className="flex flex-col items-center">
+                  {attachment.url.endsWith('.jpg') || attachment.url.endsWith('.png') || attachment.url.endsWith('.jpeg') ? (
+                    <img
+                      src={attachment.url}
+                      alt={`Attachment ${attachment.id}`}
+                      className="w-32 h-32 object-cover rounded-lg"
+                    />
+                  ) : attachment.url.endsWith('.mp4') || attachment.url.endsWith('.mov') ? (
+                    <video
+                      controls
+                      className="w-32 h-32 rounded-lg"
+                    >
+                      <source src={attachment.url} type="video/mp4" />
+                      Your browser does not support the video tag.
+                    </video>
+                  ) : (
+                    <p className="text-sm">Unsupported file type</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p>No attachments found for this journal.</p>
+          )}
+        </div>
+
+        {/* Content */}
+        <p className="text-gray-600 mb-6">{journal.content}</p>
+
+        {/* Button options */}
+        <div className="flex justify-center space-x-4 mb-4">
           <button
             onClick={handleTogglePublic}
             className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
           >
             {isPublic ? 'Make it Private' : 'Make it Public'}
           </button>
-        </div>
 
-        <div className="flex justify-center mb-4">
           <button
             className={`py-2 px-4 rounded ${isPublic ? 'bg-blue-500 text-white hover:bg-blue-600' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
             disabled={!isPublic}
@@ -134,9 +174,7 @@ const ViewJournal = () => {
           >
             Share Journal
           </button>
-        </div>
 
-        <div className="flex justify-center mb-4">
           <button
             className={`py-2 px-4 rounded ${isPublic ? 'bg-blue-500 text-white hover:bg-blue-600' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
             disabled={!isPublic}
@@ -146,35 +184,11 @@ const ViewJournal = () => {
           </button>
         </div>
 
-        {/* Display Attachments */}
-        <h3 className="text-lg font-semibold text-gray-800 mb-3">Attachments:</h3>
-        {attachments.length > 0 ? (
-          <div className="flex flex-col space-y-4">
-            {attachments.map(attachment => (
-              <div key={attachment.id} className="flex flex-col items-center">
-                {attachment.url.endsWith('.jpg') || attachment.url.endsWith('.png') || attachment.url.endsWith('.jpeg') ? (
-                  <img
-                    src={attachment.url}
-                    alt={`Attachment ${attachment.id}`}
-                    className="max-w-full h-auto rounded-lg"
-                  />
-                ) : attachment.url.endsWith('.mp4') || attachment.url.endsWith('.mov') ? (
-                  <video
-                    controls
-                    className="max-w-full h-auto rounded-lg"
-                  >
-                    <source src={attachment.url} type="video/mp4" />
-                    Your browser does not support the video tag.
-                  </video>
-                ) : (
-                  <p>Unsupported file type</p>
-                )}
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p>No attachments found for this journal.</p>
-        )}
+        {/* Timestamps */}
+        <div className="text-sm text-gray-700">
+          <p>Created at: {new Date(journal.created_at).toLocaleString()}</p>
+          <p>Updated at: {new Date(journal.updated_at).toLocaleString()}</p>
+        </div>
       </div>
 
       {showReceivedJournals && (

@@ -41,26 +41,11 @@ class JournalsController < ApplicationController
   end
 
   def update
-    uploaded_urls = []
-  
     if @journal.update(journal_params)
-      if params[:attachments].present?
-        Attachment.where(journal_id: @journal.id).delete_all
-        
-        params[:attachments].each do |attachment|
-          uploaded_file = Cloudinary::Uploader.upload(attachment)
-          uploaded_urls << uploaded_file['secure_url']
-          Attachment.create!(
-            journal_id: @journal.id,
-            url: uploaded_file['secure_url']
-          )
-        end
-      end
       
       render json: { 
         message: "Journal updated successfully.", 
         journal: @journal, 
-        attachments: uploaded_urls 
       }, status: :ok
     else
       render json: { errors: @journal.errors.full_messages }, status: :unprocessable_entity
