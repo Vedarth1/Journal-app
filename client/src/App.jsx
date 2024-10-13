@@ -9,7 +9,7 @@ function App() {
       <nav className="flex justify-between items-center p-6">
         <div className="flex items-center space-x-2">
           <img src={brandLogo} alt="Journal App" className="h-8" />
-          <span className="text-white text-2xl font-bold">Journal App</span>
+          <span className="text-white text-2xl font-bold">MindScribe</span>
         </div>
         <div className="flex space-x-4">
           <Link to='/signup' className="text-white">Signup</Link>
@@ -23,7 +23,7 @@ function App() {
         </div>
 
         <div className="w-full md:w-1/2 text-center md:text-left ml-10">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Welcome to Journal App!</h1>
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Welcome to MindScribe!</h1>
           <p className="text-lg text-white mb-8">
             Organize your thoughts.<br />
             Satisfy your inner self.<br />

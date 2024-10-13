@@ -1,3 +1,4 @@
+// complete
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
@@ -31,7 +32,7 @@ const SignUp = () => {
     };
 
     try {
-        const response=await fetch('http://127.0.0.1:3000/signup',{
+        const response=await fetch(`${import.meta.env.VITE_API_BASE_URL}/signup`,{
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -76,7 +77,7 @@ const SignUp = () => {
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-red-400 to-indigo-900">
       <ToastContainer/>
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold text-center mb-6 text-gray-700">Sign Up for Journal App</h2>
+        <h2 className="text-2xl font-bold text-center mb-6 text-gray-700">Sign Up for MindScribe App</h2>
 
         {error && <div className="text-red-500 text-center mb-4">{error}</div>}
         {success && <div className="text-green-500 text-center mb-4">{success}</div>}

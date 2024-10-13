@@ -1,10 +1,14 @@
-import React, { useState, useContext } from 'react';
+// completed
+import React, { useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { useNavigate } from 'react-router-dom';
-import { Checkbox, Typography } from "@material-tailwind/react";
+import { Checkbox } from '@material-tailwind/react';
+import { MdAttachFile, MdSave, MdOutlineAddCircleOutline } from 'react-icons/md';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const CreateJournal = () => {
   const navigate = useNavigate();
@@ -16,52 +20,54 @@ const CreateJournal = () => {
   const formik = useFormik({
     initialValues: {
       title: '',
-      summary: '',
       attachments: [],
+      viewLater: false,
     },
     validationSchema: Yup.object({
       title: Yup.string().required('Title is required'),
-      summary: Yup.string().required('Summary is required'),
     }),
     onSubmit: async (values) => {
       setSubmitError('');
       setSubmitSuccess('');
       setLoading(true);
-
+    
       try {
         const formData = new FormData();
-        formData.append('title', values.title);
-        formData.append('summary', values.summary);
-        formData.append('content', content);
-        // Assuming values.attachments is a FileList
+        formData.append('journal[title]', values.title);
+        formData.append('journal[content]', content);
+        formData.append('journal[view_later]', values.viewLater ? 'true' : 'false');
+    
         Array.from(values.attachments).forEach((file) => {
           formData.append('attachments[]', file);
         });
-
-        // const response = await api.post('/journals', formData, {
-        //   headers: {
-        //     'Content-Type': 'multipart/form-data',
-        //   },
-        // });
-
-        // if (response.status === 201 || response.status === 200) {
-        //   setSubmitSuccess('Journal created successfully!');
-        //   // Redirect to dashboard after short delay to show success message
-        //   setTimeout(() => {
-        //     navigate('/');
-        //   }, 1500);
-        // }
-      } catch (error) {
-        console.error("Error creating journal:", error);
-        if (error.response && error.response.data && error.response.data.message) {
-          setSubmitError(error.response.data.message);
-        } else {
-          setSubmitError("Failed to create journal. Please try again.");
+    
+        const token = localStorage.getItem('token');
+    
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/create/journal`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+          body: formData
+        });
+    
+        if (!response.ok) {
+          throw new Error('Failed to create journal');
         }
+    
+        setSubmitSuccess('Journal created successfully!');
+        setTimeout(() => {
+          navigate('/user/dashboard');
+        }, 1500);
+      } catch (error) {
+        setSubmitError('Failed to create journal. Please try again.');
+        toast.error("Server Side Error!", {
+          position: "top-right",
+        });
       } finally {
         setLoading(false);
       }
-    },
+    }    
   });
 
   const handleFileChange = (e) => {
@@ -69,68 +75,90 @@ const CreateJournal = () => {
   };
 
   return (
-    <div className="flex justify-center items-start p-5 min-h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-2xl mt-24">
-        <h2 className="text-center text-2xl font-bold mb-6 text-gray-800">
-          Create New Journal
-        </h2>
-        {submitError && (
-          <div className="text-red-500 text-center mb-4 text-sm">{submitError}</div>
-        )}
-        {submitSuccess && (
-          <div className="text-green-500 text-center mb-4 text-sm">{submitSuccess}</div>
-        )}
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-blue-200">
+      <ToastContainer />
+      <div className="w-full max-w-xl p-8 bg-white rounded-lg shadow-lg">
+        <h2 className="text-3xl font-bold mb-6 text-gray-800">Create New Journal</h2>
+
+        {submitError && <div className="text-red-500 mb-4">{submitError}</div>}
+        {submitSuccess && <div className="text-green-500 mb-4">{submitSuccess}</div>}
+
         <form onSubmit={formik.handleSubmit}>
+          {/* Title */}
           <div className="mb-4">
-            <label htmlFor="title" className="block mb-2 text-gray-700 text-sm font-medium">
+            <label htmlFor="title" className="block mb-2 text-gray-700">
               Title
             </label>
             <input
               id="title"
               name="title"
               type="text"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-200"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               value={formik.values.title}
               placeholder="Enter journal title"
             />
-            {formik.touched.title && formik.errors.title ? (
-              <div className="text-red-500 text-xs mt-1">{formik.errors.title}</div>
-            ) : null}
+            {formik.touched.title && formik.errors.title && (
+              <div className="text-red-500 text-sm">{formik.errors.title}</div>
+            )}
           </div>
 
+          {/* Content */}
           <div className="mb-4">
-            <label className="block mb-2 text-gray-700 text-sm font-medium">Content</label>
-            <ReactQuill
-              value={content}
-              onChange={setContent}
-              className="rounded-md border border-gray-300"
-            />
+            <label className="block mb-2 text-gray-700">Content</label>
+            <ReactQuill value={content} onChange={setContent} className="border border-gray-300 rounded-md" />
           </div>
-          <Checkbox
-            label={ <Typography color="blue-gray" className="flex font-medium">View Later</Typography> } />
+
+          {/* Checkbox */}
+          <div className="mb-4 flex items-center">
+            <Checkbox
+              id="viewLater"
+              onChange={() => formik.setFieldValue('viewLater', !formik.values.viewLater)}
+              className="mr-2"
+            />
+            <label htmlFor="viewLater" className="font-medium text-gray-700">
+              View Later
+            </label>
+          </div>
+
+          {/* Attachments */}
           <div className="mb-4">
-            <label htmlFor="attachments" className="block mb-2 text-gray-700 text-sm font-medium">
-              Attachments
+            <label htmlFor="attachments" className="block mb-2 text-gray-700">
+              Attachments <MdAttachFile className="inline-block text-gray-600" />
             </label>
             <input
               id="attachments"
               name="attachments"
               type="file"
               multiple
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-200"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
               onChange={handleFileChange}
             />
           </div>
 
-          <button
-            type="submit"
-            className="w-full bg-green-600 text-white py-2 px-4 rounded-md shadow hover:bg-green-700 transition-colors"
-            disabled={loading}
-          >
-            {loading ? 'Saving...' : 'Save Journal'}
-          </button>
+          {/* Save Button */}
+          <div className="flex justify-between items-center">
+            <button
+              type="submit"
+              className="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center justify-center hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300"
+              disabled={loading}
+            >
+              {loading ? 'Saving...' : (
+                <>
+                  <MdSave className="mr-2" /> Save Journal
+                </>
+              )}
+            </button>
+
+            <button
+              type="button"
+              className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md flex items-center justify-center hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300"
+              onClick={() => formik.resetForm()}
+            >
+              <MdOutlineAddCircleOutline className="mr-2" /> New Entry
+            </button>
+          </div>
         </form>
       </div>
     </div>

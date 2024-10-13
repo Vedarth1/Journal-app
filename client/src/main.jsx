@@ -29,7 +29,7 @@ const router = createBrowserRouter([
     element: <DashBoard/>
   },
   {
-    path:"/user/viewjournal",
+    path:"/user/viewjournal/:id",
     element: <ViewJournal/>
   },
   {
