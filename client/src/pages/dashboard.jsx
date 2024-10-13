@@ -1,8 +1,8 @@
-// completed
 import React, { useState, useEffect } from "react";
 import { Typography, Card, CardBody, Button } from "@material-tailwind/react";
 import { Link } from "react-router-dom";
 import ReceivedJournals from '../components/ReceivedJournals';
+import SharedJournal from "../components/SharedJournals";
 
 const TABLE_HEAD = [
   {
@@ -78,7 +78,7 @@ function Dashboard() {
                   <Typography variant="h6" color="gray" className="text-center">
                     Loading journals...
                   </Typography>
-                ) : journals.length > 0 ? (
+                ) : (journals && journals.length > 0) ? (
                   <table className="w-full min-w-max table-auto">
                     <thead>
                       <tr>
@@ -135,7 +135,9 @@ function Dashboard() {
                             <td className={classes}>
                               <div className="flex justify-end">
                                 <Link
-                                  to={`/user/viewjournal/${journal.id}`}
+                                  to={{
+                                    pathname: `/user/viewjournal/${journal.id}`,
+                                  }}
                                   state={{ journal }} // Pass the journal object
                                   className="sm:px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
                                 >
@@ -158,10 +160,9 @@ function Dashboard() {
               </CardBody>
             </Card>
           </div>
-
-          {/* Right Side: ReceivedJournals Component */}
           <div className="w-1/3">
             <ReceivedJournals />
+            <SharedJournal />
           </div>
         </div>
       </div>

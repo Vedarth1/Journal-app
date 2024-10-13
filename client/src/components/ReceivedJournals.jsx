@@ -1,12 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Typography, Button } from "@material-tailwind/react";
 
-const SearchIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-  </svg>
-);
-
 const ReceivedJournals = () => {
   const [sharedJournals, setSharedJournals] = useState([]);
 
@@ -39,14 +33,11 @@ const ReceivedJournals = () => {
     <div className="bg-white rounded-lg shadow-md p-4">
       <div className="flex justify-between items-center mb-4">
         <Typography variant="h5" color="blue-gray">
-          Shared Journals
+          Received Journals
         </Typography>
-        <Button size="sm" color="blue" variant="text">
-          See all
-        </Button>
       </div>
       <div className="space-y-4">
-        {sharedJournals.length > 0 ? (
+        {sharedJournals&&sharedJournals.length > 0 ? (
           sharedJournals.map((journal) => (
             <div key={journal.id} className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
@@ -67,7 +58,7 @@ const ReceivedJournals = () => {
                   size="sm"
                   color="blue"
                   variant="text"
-                  onClick={() => window.location.href = `/user/viewjournal/${journal.id}`}
+                  onClick={() => window.location.href = `/user/sharedjournal/${journal.permission}/${journal.id}`}
                 >
                   View
                 </Button>

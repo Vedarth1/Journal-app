@@ -40,7 +40,32 @@ class JournalPermissionController < ApplicationController
         end
     end
 
+    def sharedjournals
+      user = User.find_by(id: current_user.id)
+      Rails.logger.info "Current user: #{user.username}"
+    
+      shared_journals = JournalPermission.where(shared_by: user.username)
+      
+      render json: {
+        shared_journals: shared_journals.map do |permission_record|
+          journal = permission_record.journal
+          {
+            id: journal.id,
+            user_id:permission_record.user_id,
+            title: journal.title,
+            content: journal.content,
+            shared_to: permission_record.shared_to,
+            permission: permission_record.permission
+          }
+        end
+      }, status: :ok
+    end
+
     private
+
+    def journal_params
+      params.require(:journal).permit(:title, :content, :visibility, :view_later)
+    end
 
     def set_shared_journal
         user_to_remove = User.find_by(username: params[:username])

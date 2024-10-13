@@ -84,7 +84,8 @@ class JournalsController < ApplicationController
           journal: @journal,
           user: user_to_share_with,
           permission: permission,
-          shared_by: current_user.username
+          shared_by: current_user.username,
+          shared_to: params[:username]
         )
         render json: { message: 'Journal shared successfully' }, status: :ok
       end
@@ -94,10 +95,7 @@ class JournalsController < ApplicationController
   end
 
   def revokeshare
-    user_to_revoke = User.find_by(username: params[:username])
-  
-    if user_to_revoke
-      shared_journal = JournalPermission.find_by(journal_id: @journal.id, user_id: user_to_revoke.id)
+      shared_journal = JournalPermission.find_by(journal_id: @journal.id, user_id: params[:user_id])
   
       if shared_journal
         shared_journal.destroy
@@ -105,9 +103,6 @@ class JournalsController < ApplicationController
       else
         render json: { error: 'No sharing permission found for this user' }, status: :not_found
       end
-    else
-      render json: { error: 'User not found' }, status: :not_found
-    end
   end
 
   def update_visibility
@@ -125,6 +120,11 @@ class JournalsController < ApplicationController
     else
       render json: { message: 'This journal is not public.' }, status: :forbidden
     end
+  end
+
+  def sharedjournals
+    sharedjournal=Journal.find_by(id: params[:id])
+    render json: sharedjournal, status: :ok
   end
 
   private
