@@ -23,7 +23,11 @@ MindScribe is a full-stack journal application designed to help users document t
 
 ## FlowDiagram
 
-[MindScribe Flowgraph](https://drive.google.com/file/d/1ZhXjtwE6StxzB-rnYUt9bN8_4redlsQM/view)
+![MindScribe Flowgraph](https://res.cloudinary.com/dycy3tfm8/image/upload/v1728889971/x981cslyomxb5ark1fan.png)
+
+## Landing Page
+
+![Landing Page](https://res.cloudinary.com/dycy3tfm8/image/upload/v1728923220/cyiebvipu8ovnmzkvisl.png)
 
 ## Run Locally
 
