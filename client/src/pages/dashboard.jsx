@@ -3,6 +3,8 @@ import { Typography, Card, CardBody, Button } from "@material-tailwind/react";
 import { Link } from "react-router-dom";
 import ReceivedJournals from '../components/ReceivedJournals';
 import SharedJournal from "../components/SharedJournals";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const TABLE_HEAD = [
   {
@@ -19,7 +21,6 @@ function Dashboard() {
   const [journals, setJournals] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch journals from the backend
   useEffect(() => {
     const token = localStorage.getItem('token');
 
@@ -39,6 +40,9 @@ function Dashboard() {
         setJournals(data.journals);
       } catch (error) {
         console.error("Error fetching journals:", error);
+        toast.error("Server Side Error!", {
+            position: "top-right"
+        });
       } finally {
         setLoading(false);
       }
@@ -49,6 +53,7 @@ function Dashboard() {
 
   return (
     <section className="min-h-screen bg-gray-50 py-10 px-4 md:px-8 lg:px-16">
+      <ToastContainer/>
       <div className="max-w-screen-xl mx-auto">
         {/* Header with Journal Overview Text and Create Journal Button */}
         <div className="flex justify-between items-center mb-4">

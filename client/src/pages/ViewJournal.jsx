@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FaTrash, FaEdit } from 'react-icons/fa';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ViewJournal = () => {
   const { id } = useParams(); 
@@ -49,6 +51,9 @@ const ViewJournal = () => {
         setAttachments(attachmentsData); // Set attachments state
       } catch (error) {
         console.error("Error fetching journal:", error);
+        toast.error("Server Side Error!", {
+            position: "top-right"
+        });
       }
     };
 
@@ -73,7 +78,13 @@ const ViewJournal = () => {
       }
   
       setIsPublic(!isPublic);
+      toast.success("Permission Changed successfully!", {
+        position: "top-right",
+      });
     } catch (error) {
+      toast.error("Server Side Error!", {
+          position: "top-right"
+      });
       console.error('Error updating visibility:', error);
     }
   };
@@ -107,6 +118,9 @@ const ViewJournal = () => {
         }
         navigate('/user/dashboard');
       } catch (error) {
+        toast.error("Server Side Error!", {
+            position: "top-right"
+        });
         console.error("Error deleting journal:", error);
       }
     }
@@ -136,11 +150,15 @@ const ViewJournal = () => {
         throw new Error('Failed to share journal');
       }
       
-      alert('Journal shared successfully');
       setShowShareModal(false);
+      toast.success("Journal Shared successfully!", {
+        position: "top-right",
+      });
     } catch (error) {
+      toast.error("Server Side Error!", {
+          position: "top-right"
+      });
       console.error('Error sharing journal:', error);
-      alert('Error sharing journal');
     }
   };
 
@@ -169,6 +187,7 @@ const ViewJournal = () => {
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100 relative">
+      <ToastContainer/>
         {/* Return to Dashboard Button */}
         <div className="absolute top-4 right-4">
           <button

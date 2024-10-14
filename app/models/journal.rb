@@ -1,7 +1,7 @@
 class Journal < ApplicationRecord
   belongs_to :user
-  has_many_attached :attachments
-  has_many :journal_permissions
+  has_many_attached :attachments, dependent: :destroy
+  has_many :journal_permissions, dependent: :destroy
 
   before_create :generate_public_url
 
