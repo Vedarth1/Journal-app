@@ -53,11 +53,14 @@ class JournalsController < ApplicationController
   end  
 
   def destroy
-    if @journal.nil?
-      render json: { error: "No journal." }, status: :not_found
-    else
+    if @journal
+      Attachment.where(journal_id: @journal.id).destroy_all
+      JournalPermission.where(journal_id: @journal.id).destroy_all
       @journal.destroy
-      render json: { message: "Journal deleted successfully" }, status: :no_content
+  
+      render json: { message: "Journal and related data deleted successfully" }, status: :ok
+    else
+      render json: { error: "Journal not found" }, status: :not_found
     end
   end
 
