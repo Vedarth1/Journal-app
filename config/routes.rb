@@ -21,4 +21,5 @@ Rails.application.routes.draw do
   delete '/journals/:id/shareddelete/:username', to: 'journal_permission#destroy'
   put '/journals/:id/sharedupdate/:username/:permission', to: 'journal_permission#update_permission'
   delete '/journals/:id/revokeshare/:user_id', to: 'journals#revokeshare'
+  put 'update/sharedjournal/:id', to: 'journal_permission#updatesharedjournal'
 end

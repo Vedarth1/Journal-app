@@ -48,7 +48,7 @@ const ViewSharedJournal = () => {
   
 
   const handleEditJournal = () => {
-    navigate(`/user/edit-journal/${id}`, { state: { journal } });
+    navigate(`/user/edit-sharedjournal/${permission}/${id}`, { state: { journal } });
   };
 
   const handleReturnToDashboard = () => {

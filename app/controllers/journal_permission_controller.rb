@@ -61,6 +61,19 @@ class JournalPermissionController < ApplicationController
       }, status: :ok
     end
 
+    def updatesharedjournal
+      sharedjournal=Journal.find_by(id: params[:id])
+      if sharedjournal.update(journal_params)
+      
+        render json: { 
+          message: "Journal updated successfully.", 
+          journal: sharedjournal, 
+        }, status: :ok
+      else
+        render json: { errors: sharedjournal.errors.full_messages }, status: :unprocessable_entity
+      end
+    end
+
     private
 
     def journal_params

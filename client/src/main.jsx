@@ -12,6 +12,7 @@ import CreateJournal from "./pages/createJournal.jsx";
 import EditJournal from "./pages/EditJournal.jsx";
 import PublicJournalPage from "./pages/publicjournalpage.jsx";
 import ViewSharedJournal from "./pages/viewSharedJournal.jsx";
+import EditSharedJournal from "./pages/editsharedjournal.jsx";
 
 const router = createBrowserRouter([
   {
@@ -50,6 +51,10 @@ const router = createBrowserRouter([
   {
     path:"/user/sharedjournal/:permission/:id",
     element:<ViewSharedJournal/>
+  },
+  {
+    path:"/user/edit-sharedjournal/:permission/:id",
+    element:<EditSharedJournal/>
   }
 ]);
 
